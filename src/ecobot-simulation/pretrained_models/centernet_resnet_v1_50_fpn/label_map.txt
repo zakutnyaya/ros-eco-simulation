@@ -1,0 +1,8 @@
+item {
+  name: "cube"
+  id: 1
+}
+item {
+  name: "cylinder"
+  id: 2
+}

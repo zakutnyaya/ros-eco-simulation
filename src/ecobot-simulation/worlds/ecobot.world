@@ -1,0 +1,112 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+
+    <world name="eco_world">
+
+        <include>
+            <uri>model://ground_plane</uri>
+        </include>
+
+        <include>
+            <uri>model://sun</uri>
+        </include>
+
+        <include>
+            <uri>model://demo_object</uri>
+            <pose>0 1. 1 0 0 0 </pose>
+        </include>
+
+        <model name='Rot_table'>
+            <link name='link_0'>
+                <inertial>
+                    <mass>100</mass>
+                    <inertia>
+                    <ixx>14.583333333</ixx>
+                    <ixy>0</ixy>
+                    <ixz>0</ixz>
+                    <iyy>14.583333333</iyy>
+                    <iyz>0</iyz>
+                    <izz>12.5</izz>
+                    </inertia>
+                </inertial>
+                <pose>0 0 0 0 0 0</pose>
+
+                <visual name='visual'>
+                    <pose>0 0 0 0 0 0</pose>
+                    <geometry>
+                        <cylinder>
+                            <radius>0.5</radius>
+                            <length>1</length>
+                        </cylinder>
+                    </geometry>
+                    <material>
+                        <script>
+                            <uri>file://media/materials/scripts/gazebo.material</uri>
+                            <name>Gazebo/Wood</name>
+                        </script>
+                    </material>
+                </visual>
+
+                <collision name='collision'>
+                    <pose>0 0 0 0 0 0</pose>
+                    <geometry>
+                    <cylinder>
+                        <radius>0.5</radius>
+                        <length>1</length>
+                    </cylinder>
+                    </geometry>
+                </collision>
+                <static>1</static>
+            </link>
+
+            <link name='link_1'>
+                <inertial>
+                    <mass>4</mass>
+                    <inertia>
+                    <ixx>1.5172</ixx>
+                    <ixy>0</ixy>
+                    <ixz>0</ixz>
+                    <iyy>1.5172</iyy>
+                    <iyz>0</iyz>
+                    <izz>2.42</izz>
+                    </inertia>
+                </inertial>
+                <pose>0 0 0. 0 0 0</pose>
+
+                <visual name='visual'>
+                    <pose>0 0 0.32 0 -0 0</pose>
+                    <geometry>
+                    <cylinder>
+                        <radius>1.1</radius>
+                        <length>0.3</length>
+                    </cylinder>
+                    </geometry>
+                    <material>
+                        <script>Gazebo/White</script>
+                    </material>
+                </visual>
+
+                <collision name='collision'>
+                    <pose>0 0 0. 0 0 0</pose>
+                    <geometry>
+                    <cylinder>
+                        <radius>1.1</radius>
+                        <length>0.96</length>
+                    </cylinder>
+                    </geometry>
+                </collision>
+            </link>
+
+            <joint name='joint_rot' type='revolute'>
+                <parent>link_0</parent>
+                <child>link_1</child>
+                <pose>0 0 0. 0 0 0</pose>
+                <axis>
+                    <xyz>0 0 1</xyz>
+                </axis>
+            </joint>
+            <pose>0 1.75 0 0 0 0</pose>
+        
+        </model>
+    </world>
+</sdf>

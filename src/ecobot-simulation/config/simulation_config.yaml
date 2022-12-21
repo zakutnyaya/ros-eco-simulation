@@ -1,0 +1,46 @@
+robot_params:
+    initial_position: {6: [0, 0.5, -1.5, 1.5, -4.6, 1.5]}
+    robot_joints_names: [
+      'shift_joint',
+      'lift_joint',
+      'finger1_joint',
+      'finger2_joint',
+      'finger3_joint',
+      'finger4_joint'
+    
+    ]
+    grab_trajectory_dict: {
+      1: [1, 0.5, -1.5, 1.5, -4.6, 1.5],
+      2: [1, -0.5, -1.5, 1.5, -4.6, 1.5],
+      3: [1, 0, -3, 3.2, -2.8, 3.1],
+      4: [1, 0.5, -3, 3.2, -2.8, 3.1],
+      5: [-1, 0.5, -3, 3.2, -2.8, 3.1],
+      6: [-1, 0.5, -1.5, 1.5, -4.6, 1.5]
+    }
+    time_delta_dict: {
+      1: -2,
+      2: 1,
+      3: 1,
+      4: 1,
+      5: 1,
+      6: 2
+    }
+    arm_time_delay: 2
+    
+
+table_params:
+  table_big_radius: 1.1
+  table_velocity: -0.11
+  table_time_delay: 0.5
+        
+model_params:
+  detection_thr: 0.2
+  detection_model_img_size: 512
+
+camera_params:
+  cam_frame_origin_x: 0.75  # origin of the camera frame
+  cam_frame_origin_y: 1.75
+  cam_depth: 0.815  # camera depth (dist from the camera to table)
+  cam_focal_length: 547.9  # camera focal length
+  ox: 200.5 # origin of an image
+  oy: 200.5 # origin of an image

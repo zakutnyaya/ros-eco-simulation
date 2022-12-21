@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<launch>
+    <node pkg="ecobot-simulation" name="table_spin" type="twist_spin.py">
+    </node>
+    <node pkg="ecobot-simulation" name="table_listen" type="spin_table.py">
+        <param name="config_path" value="$(find ecobot-simulation)/config/simulation_config.yaml"/>
+        <param name="in_arm_status_topic" value="/eco/arm_status"/>
+        <param name="in_table_topic" value="/eco/detection_coordinates"/>
+    </node>
+    <node pkg="ecobot-simulation" name="arm_prepare" type="grab_object.py">
+        <param name="config_path" value="$(find ecobot-simulation)/config/simulation_config.yaml"/>
+        <param name="out_arm_status_topic" value="/eco/arm_status"/>
+        <param name="trajectory_client_topic" value="/eco/arm_controller/follow_joint_trajectory"/>
+        <param name="in_detection_topic" value="/eco/detection_coordinates"/>
+    </node> 
+</launch>

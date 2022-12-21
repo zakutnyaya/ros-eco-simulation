@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<launch>
+    <node pkg="ecobot-simulation" name="detection" type="detect.py">
+        <param 
+            name="model_path" 
+            value="$(find ecobot-simulation)/pretrained_models/centernet_resnet_v1_50_fpn/model.tflite" 
+        />
+        <param name="in_image_topic" value="/eco/camera1/image_raw"/>
+        <param name="out_detection_topic" value="/eco/detection_coordinates"/>
+        <param name="config_path" value="$(find ecobot-simulation)/config/simulation_config.yaml"/>
+    </node>
+</launch>

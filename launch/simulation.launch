@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<launch>
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+        <arg name="world_name" value="$(find ecobot-simulation)/worlds/ecobot.world"/>
+    </include>
+    <include file="$(find ecobot-simulation)/launch/spawn_ecobot_with_controllers.launch"/>
+    <include file="$(find ecobot-simulation)/launch/load_controllers.launch"/>
+</launch>
