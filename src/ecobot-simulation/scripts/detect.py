@@ -29,7 +29,9 @@ oy = config['camera_params']['oy']
 table_velocity = config['table_params']['table_velocity']
 
 
-class RosTensorFlow:
+class Detector:
+    """Detect an object and calculate its real-world coordinates.
+    """
     def __init__(
         self,
         model,
@@ -53,6 +55,14 @@ class RosTensorFlow:
         )
 
     def preprocess_image(self, image: np.ndarray) -> tf.Tensor:
+        """Preprocess image before model inference.
+
+        Args:
+            image (np.ndarray): Image
+
+        Returns:
+            tf.Tensor: Tensorflow tensor
+        """
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB).astype(np.float32)
         image = tf.expand_dims(image, axis=0)
         input_tensor = tf.convert_to_tensor(image, dtype=tf.float32)
@@ -63,6 +73,15 @@ class RosTensorFlow:
         return input_tensor
 
     def detect(self, input_tensor: tf.Tensor) -> np.ndarray:
+        """Run the detection model on the preprocessed image.
+        Filter detections (bounding boxes) by detection score threshold.
+
+        Args:
+            input_tensor (tf.Tensor): Tensorflow image tensor
+
+        Returns:
+            np.ndarray: Bounding boxes filtered by detection score
+        """
         self.model.allocate_tensors()
         input_details = self.model.get_input_details()
         output_details = self.model.get_output_details()
@@ -80,6 +99,16 @@ class RosTensorFlow:
         image_height: int,
         image_width: int
     ) -> List[float]:
+        """Calculate current real-world coordinates of the detected object.
+
+        Args:
+            target_bboxes (np.ndarray): Bounding box
+            image_height (int): Height of the image recieved from the camera
+            image_width (int): Width of the image recieved from the camera
+
+        Returns:
+            List[float]: Real-world coordinates (x and y) of the detected object
+        """
         y1, x1, y2, x2 = target_bboxes
         x1 = int(x1 * image_width)
         y1 = int(y1 * image_height)
@@ -97,6 +126,17 @@ class RosTensorFlow:
         coordinates: tuple,
         shot_time: float
     ) -> List[float]:
+        """Calculate the y-coordinate of the object at the moment when it crosses the x-axis.
+        Calculate the time (t1) when the object will cross the x-axis.
+
+        Args:
+            coordinates (tuple): Real-world coordinates of the object in t0 moment
+            shot_time (float): Time in seconds (t0) when the object was captured by the camera
+
+        Returns:
+            List[float]: Real-world y-coordinate of the object's final destination and
+            time in secs when the object will arrive at this point
+        """
         reference = [0, cam_frame_origin_y]
         point = np.array(coordinates) - reference
         x, y = point[1], -point[0]
@@ -117,6 +157,13 @@ class RosTensorFlow:
         return [target_y, target_time]
 
     def callback(self, image_msg: Image) -> None:
+        """Receive an image from the camera.
+        Preprocess the image.
+        Detect an object on the image.
+        Calculate current real-world coordinates of the object.
+        Calculate the y-coordinate of the object at the moment when it crosses the x-axis.
+        Send the y-coordinate and the time of object arrival on the x-axis to the robot.
+        """
         shot_time = rospy.Time.now().to_sec()
 
         image_np = self._cv_bridge.imgmsg_to_cv2(image_msg, "bgr8")
@@ -143,7 +190,7 @@ class RosTensorFlow:
 def main_action(_argv):
     model = tf.lite.Interpreter(rospy.get_param('~model_path'))
 
-    actor = RosTensorFlow(
+    actor = Detector(
         model=model,
         in_image_topic=rospy.get_param('~in_image_topic'),
         out_detection_topic=rospy.get_param('~out_detection_topic'),

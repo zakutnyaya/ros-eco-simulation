@@ -4,7 +4,7 @@ import yaml
 from absl import app
 import actionlib
 import rospy
-from std_msgs.msg import Header, Bool, String
+from std_msgs.msg import Header, String
 from rospy_tutorials.msg import Floats
 from trajectory_msgs.msg import JointTrajectory
 from trajectory_msgs.msg import JointTrajectoryPoint
@@ -28,7 +28,10 @@ table_velocity = config['table_params']['table_velocity']
 table_big_radius = config['table_params']['table_big_radius']
 
 
-class GetCoordinatesMove:
+class RobotArm:
+    """Receive future coordinates of the detected object.
+    Send a message with the trajectory to the object to arm controllers.
+    """
     def __init__(
         self,
         out_arm_status_topic: str,
@@ -60,6 +63,12 @@ class GetCoordinatesMove:
         time_coord_dict: dict,
         start_time: float
     ) -> None:
+        """Send trajectory to the arm controllers.
+
+        Args:
+            time_coord_dict (dict): Dictionary with the arm trajectory
+            start_time (float): Time in secs when to launch arm controllers
+        """
         joints_str = JointTrajectory()
         joints_str.header = Header()
         if start_time:
@@ -96,6 +105,15 @@ class GetCoordinatesMove:
         y_coordinate: float,
         move_time: float
     ) -> dict:
+        """Set a trajectory for the robot arm.
+
+        Args:
+            y_coordinate (float): y-coordinate of the object's final position on the x-axis
+            move_time (float): Time of object arrival on the x-axis
+
+        Returns:
+            dict: Dictionary with the arm trajectory for object capture
+        """
         trajectory_dict = {}
         time = move_time
         for joint, time_delta in time_delta_dict.items():
@@ -106,6 +124,16 @@ class GetCoordinatesMove:
         return trajectory_dict
 
     def coordinates_callback(self, coord_msg: Floats) -> None:
+        """Receive the y-coordinate and the time (t1) of the detected object arrival on the x-axis.
+        Set the trajectory for the arm.
+        Send trajectory to the arm controllers.
+        Grab the object at the y-coordinate at the time t1.
+        Send a message to the table that object capture is done.
+
+        Args:
+            coord_msg (Floats): Message from detection node
+            (y-coordinate of the object, time of arrival)
+        """
         target_y, target_time = coord_msg.data
         n = abs(table_velocity) * 180 / math.pi
         secs_per_meter = 1 / (math.pi * table_big_radius * n / 180)
@@ -119,7 +147,7 @@ class GetCoordinatesMove:
 
 
 def main_action(_argv):
-    action = GetCoordinatesMove(
+    action = RobotArm(
         out_arm_status_topic=rospy.get_param('~out_arm_status_topic'),
         trajectory_client_topic=rospy.get_param('~trajectory_client_topic'),
         in_detection_topic=rospy.get_param('~in_detection_topic')

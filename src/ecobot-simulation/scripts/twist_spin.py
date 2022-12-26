@@ -8,13 +8,21 @@ rate = rospy.Rate(hz=10)
 
 table_velocity = - 0.11
 
-while not rospy.is_shutdown():
-    state = LinkState()
-    state.link_name = 'Rot_table::link_1'
-    state.reference_frame = 'Rot_table::link_0'
 
-    state.twist.angular.z = table_velocity
+def launch_table():
+    """Launch rotation of the table.
+    """
+    while not rospy.is_shutdown():
+        state = LinkState()
+        state.link_name = 'Rot_table::link_1'
+        state.reference_frame = 'Rot_table::link_0'
 
-    set_state = rospy.ServiceProxy('/gazebo/set_link_state', SetLinkState)
-    result = set_state(state)
-    rate.sleep()
+        state.twist.angular.z = table_velocity
+
+        set_state = rospy.ServiceProxy('/gazebo/set_link_state', SetLinkState)
+        set_state(state)
+        rate.sleep()
+
+
+if __name__ == '__main__':
+    launch_table()

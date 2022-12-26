@@ -16,7 +16,10 @@ config = config['table_params']
 time_delta = config['table_time_delay']
 
 
-class Table(object):
+class Table:
+    """Receive future coordinates of the detected object.
+    At time t1 stop the table to let the robot arm grab the object from the table.
+    """
     def __init__(
         self,
         in_arm_status_topic: str,
@@ -30,7 +33,9 @@ class Table(object):
             self.arm_msg_callback
         )
 
-    def stop_table(self):
+    def stop_table(self) -> None:
+        """Stop rotation of the table and let the arm grab the object.
+        """
         state = LinkState()
         state.link_name = 'Rot_table::link_1'
         state.reference_frame = 'Rot_table::link_0'
@@ -38,10 +43,21 @@ class Table(object):
         set_state = rospy.ServiceProxy('/gazebo/set_link_state', SetLinkState)
         set_state(state)
 
-    def arm_msg_callback(self, msg):
+    def arm_msg_callback(self, msg: String) -> None:
+        """Receive status from the arm on object capturing.
+
+        Args:
+            msg (String): Message with the arm status
+        """
         self.arm_msg = msg.data
 
-    def callback(self, msg):
+    def callback(self, msg: Floats) -> None:
+        """Receive the y-coordinate and the time (t1) of the detected object arrival on the x-axis.
+        Stop the table at the time t1.
+        Args:
+            msg (Floats): Message from detection node
+            (y-coordinate of the object, time of arrival)
+        """
         target_time = msg.data[1]
         if target_time:
             cur_time = rospy.Time.now().to_sec()
